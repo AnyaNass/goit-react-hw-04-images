@@ -24,27 +24,14 @@ export function App() {
 		if (page === 1) {
 			return;
 		}
-		try {
-			const fetch = async () => {
-				const response = await API.getImages(page);
 
-				if (response.total === 0) {
-					throw new Error();
-				}
+		API.getImages(searchQuery, page).then(resp => setGallery(prevGallery => [...prevGallery, ...resp.hits]));
+		console.log(page);
+		setError(false);
+		setLoading(false);
+		setLoadMoreBtn(true);
 
-				setError(false);
-				setLoading(false);
-				setLoadMoreBtn(true);
-				setGallery(prevGallery => [...prevGallery, ...response.hits]);
-			}
-
-			fetch();
-		} catch (error) {
-			setError(true);
-			setGallery([]);
-			setLoading(false);
-		}
-	}, [page])
+	}, [page, searchQuery])
 
 	useEffect(() => {
 		if (showModal) {
@@ -64,9 +51,10 @@ export function App() {
 		setSearchQuery(searchQuery)
 		setLoading(true);
 		setError(false);
+		setPage(1);
 
 		try {
-			const gallery = await API.getImages(searchQuery);
+			const gallery = await API.getImages(searchQuery, 1);
 
 			if (gallery.total === 0) {
 				throw new Error();
