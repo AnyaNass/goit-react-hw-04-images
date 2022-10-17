@@ -21,22 +21,21 @@ export function App() {
 	const [tags, setTags] = useState('');
 
 	useEffect(() => {
-		if (searchQuery === '') {
+		if (page === 1) {
 			return;
 		}
-
 		try {
 			const fetch = async () => {
-				const response = await API.getImages(searchQuery, page);
+				const response = await API.getImages(page);
 
 				if (response.total === 0) {
 					throw new Error();
 				}
 
-				setGallery([...gallery, ...response.hits]);
 				setError(false);
 				setLoading(false);
 				setLoadMoreBtn(true);
+				setGallery(prevGallery => [...prevGallery, ...response.hits]);
 			}
 
 			fetch();
@@ -59,7 +58,6 @@ export function App() {
 		setPage(prevPage => prevPage + 1);
 		setLoading(true);
 		setLoadMoreBtn(false);
-		// this.setState(prevState => ({ page: prevState.page + 1, loading: true, loadMoreBtn: false }))
 	}
 
 	const handleFormSubmit = async searchQuery => {
@@ -77,6 +75,7 @@ export function App() {
 			setLoading(false);
 			setLoadMoreBtn(true);
 			setTotalPages(Math.ceil(gallery.totalHits / gallery.hits.length));
+			window.scrollTo(0, 0);
 		}
 		catch (error) {
 			setError(true);
